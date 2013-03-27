@@ -1,0 +1,37 @@
+xiapply
+-------
+
+There are a few settings I must apply to my keyboard when I start X11
+(e.g. remapping Caps Lock, setting the repeat rate).  Unfortunately, these
+changes are not applied to subsequently added devices.  This means when I
+plug a real keyboard into my laptop, or every time I flip the USB switch
+it passes through, I have to manually reapply these changes.  (Usually not
+before I've sent a scary variety of capital letters to vi.)  Making these
+changes permanent by changing the X server's configuration might be
+possible, but doing so strikes me as inelegant -- though I consider
+these settings a necessity, they are nonetheless user customizations.
+
+xiapply is an X11 client that executes its argument once and then
+listens to XInput events [1].  When an event comes in signalling that a
+device has been enabled, xiapply's argument is re-executed.  No effort
+is made to coalesce related events -- xiapply's argument is expected
+to be idempotent.  xiapply will, however, run only one instance of its
+argument at a time.
+
+xiapply runs until it encounters an error or the X server goes away.
+You will probably want to place it in the background.
+
+Example:
+
+  $ xiapply setxkbmap -option ctrl:nocaps &
+
+Compatibility
+-------------
+
+This was written on Linux, but should probably work elsewhere.  One
+potential problem is that, frustratingly, one must use glibc-specific
+arguments to get POSIX-compliant behavior out of glibc's getopt().
+You get what you pay for.
+
+
+[1] This actually happens in the opposite order to avoid the obvious race.
